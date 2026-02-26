@@ -1,27 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from 'lucide-react';
 
 const PLAYLIST = [
   {
     id: 1,
-    title: "Neon Dreams",
-    artist: "AI SynthBot Alpha",
+    title: "DATA_CORRUPTION_01",
+    artist: "UNKNOWN_ENTITY",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-    cover: "https://picsum.photos/seed/neon1/400/400"
   },
   {
     id: 2,
-    title: "Cybernetic Pulse",
-    artist: "Neural Network Beats",
+    title: "SECTOR_FAULT",
+    artist: "SYS_ADMIN",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-    cover: "https://picsum.photos/seed/neon2/400/400"
   },
   {
     id: 3,
-    title: "Digital Horizon",
-    artist: "Algorithm Groove",
+    title: "KERNEL_PANIC",
+    artist: "ROOTKIT",
     url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-    cover: "https://picsum.photos/seed/neon3/400/400"
   }
 ];
 
@@ -29,7 +25,6 @@ export function MusicPlayer() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -48,9 +43,9 @@ export function MusicPlayer() {
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
+      audioRef.current.volume = volume;
     }
-  }, [volume, isMuted]);
+  }, [volume]);
 
   const togglePlay = () => setIsPlaying(!isPlaying);
   
@@ -78,18 +73,12 @@ export function MusicPlayer() {
     handleNext();
   };
 
-  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (audioRef.current) {
-      const bounds = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - bounds.left;
-      const percentage = x / bounds.width;
-      audioRef.current.currentTime = percentage * audioRef.current.duration;
-      setProgress(percentage * 100);
-    }
-  };
-
   return (
-    <div className="bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl neon-border-pink w-full max-w-sm flex flex-col items-center gap-4">
+    <div className="border-glitch p-6 w-full max-w-sm flex flex-col items-start gap-6 relative">
+      <div className="absolute top-0 left-0 bg-[#00ffff] text-black text-xs px-2 py-1 font-bold">
+        AUDIO_STREAM.EXE
+      </div>
+      
       <audio 
         ref={audioRef} 
         src={currentTrack.url} 
@@ -97,64 +86,52 @@ export function MusicPlayer() {
         onEnded={handleTrackEnded}
       />
       
-      <div className="relative w-48 h-48 rounded-lg overflow-hidden neon-border">
-        <img 
-          src={currentTrack.cover} 
-          alt="Album Cover" 
-          className={`w-full h-full object-cover transition-transform duration-10000 ${isPlaying ? 'scale-110' : 'scale-100'}`}
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-      </div>
-      
-      <div className="text-center w-full">
-        <h2 className="font-display text-xl font-bold text-white truncate neon-text-pink">{currentTrack.title}</h2>
-        <p className="text-pink-300/80 text-sm truncate">{currentTrack.artist}</p>
+      <div className="w-full mt-4">
+        <div className="text-[#ff00ff] text-xs mb-1 tracking-widest">CURRENT_FILE:</div>
+        <h2 className="font-display text-3xl font-bold text-white uppercase glitch-text" data-text={currentTrack.title}>
+          {currentTrack.title}
+        </h2>
+        <p className="text-[#00ffff] text-sm mt-1">SRC: {currentTrack.artist}</p>
       </div>
       
       {/* Progress Bar */}
-      <div 
-        className="w-full h-2 bg-gray-800 rounded-full cursor-pointer overflow-hidden"
-        onClick={handleProgressClick}
-      >
-        <div 
-          className="h-full bg-pink-500 shadow-[0_0_10px_#f0f]" 
-          style={{ width: `${progress}%` }}
-        />
+      <div className="w-full">
+        <div className="text-xs text-gray-500 mb-1">BUFFER_STATUS: {Math.round(progress)}%</div>
+        <div className="w-full h-4 border border-[#00ffff] bg-black relative">
+          <div 
+            className="h-full bg-[#ff00ff]" 
+            style={{ width: `${progress}%` }}
+          />
+        </div>
       </div>
       
       {/* Controls */}
-      <div className="flex items-center justify-center gap-6 w-full">
-        <button onClick={handlePrev} className="text-white hover:text-pink-400 transition-colors">
-          <SkipBack size={24} />
+      <div className="flex items-center justify-between w-full border-t border-b border-[#ff00ff] py-2">
+        <button onClick={handlePrev} className="text-[#00ffff] hover:text-white hover:bg-[#00ffff] px-2 py-1 transition-colors">
+          [PREV]
         </button>
         <button 
           onClick={togglePlay} 
-          className="w-14 h-14 flex items-center justify-center bg-pink-500 hover:bg-pink-400 text-white rounded-full shadow-[0_0_15px_#f0f] transition-all transform hover:scale-105"
+          className="text-[#ff00ff] hover:text-white hover:bg-[#ff00ff] px-4 py-1 font-bold transition-colors text-xl"
         >
-          {isPlaying ? <Pause size={28} /> : <Play size={28} className="ml-1" />}
+          {isPlaying ? '[PAUSE]' : '[PLAY]'}
         </button>
-        <button onClick={handleNext} className="text-white hover:text-pink-400 transition-colors">
-          <SkipForward size={24} />
+        <button onClick={handleNext} className="text-[#00ffff] hover:text-white hover:bg-[#00ffff] px-2 py-1 transition-colors">
+          [NEXT]
         </button>
       </div>
       
       {/* Volume */}
-      <div className="flex items-center gap-3 w-full mt-2">
-        <button onClick={() => setIsMuted(!isMuted)} className="text-gray-400 hover:text-white">
-          {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </button>
+      <div className="w-full">
+        <div className="text-xs text-gray-500 mb-1">OUTPUT_GAIN:</div>
         <input 
           type="range" 
           min="0" 
           max="1" 
           step="0.01" 
-          value={isMuted ? 0 : volume}
-          onChange={(e) => {
-            setVolume(parseFloat(e.target.value));
-            if (isMuted) setIsMuted(false);
-          }}
-          className="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-pink-500"
+          value={volume}
+          onChange={(e) => setVolume(parseFloat(e.target.value))}
+          className="w-full h-2 bg-black border border-[#ff00ff] appearance-none cursor-pointer accent-[#00ffff]"
         />
       </div>
     </div>
